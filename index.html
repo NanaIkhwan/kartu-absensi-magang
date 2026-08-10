@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kartu Absensi Magang</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="wrap">
+
+    <header class="header">
+      <p class="eyebrow">Kartu Absensi — Program Magang</p>
+      <h1 class="title">90 Hari Kerja</h1>
+      <p class="sub">Klik kotak untuk cap kehadiran hari itu. Progres tersimpan otomatis di perangkat ini.</p>
+    </header>
+
+    <section class="stamp-panel" id="stampPanel">
+      <button class="stamp-btn" id="stampToday">
+        <span class="stamp-btn-label">Cap Hadir Hari Ini</span>
+        <span class="stamp-btn-sub" id="nextDayLabel">Hari ke-1</span>
+      </button>
+
+      <div class="progress-block">
+        <div class="progress-numbers">
+          <span class="progress-percent" id="progressPercent">0%</span>
+          <span class="progress-fraction" id="progressFraction">0 / 90 hari</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <p class="progress-note" id="progressNote">Belum ada hari yang tercatat. Mulai dari hari ke-1.</p>
+      </div>
+    </section>
+
+    <section class="ledger">
+      <div class="ledger-head">
+        <h2>Buku Absen</h2>
+        <button class="reset-btn" id="resetBtn">Reset semua</button>
+      </div>
+      <div class="grid" id="grid"></div>
+    </section>
+
+    <footer class="footer">
+      <p>UKMBiz QA Internship &middot; target 90 hari kerja</p>
+    </footer>
+
+  </div>
+
+<script src="script.js"></script>
+</body>
+</html>
