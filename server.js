@@ -16,22 +16,34 @@ const isProduction = process.env.NODE_ENV === 'production';
 
 let pool;
 if (process.env.MYSQL_URL) {
-  // Railway menyediakan MYSQL_URL (connection string)
+  console.log('[DB] Menggunakan MYSQL_URL (Railway connection string)');
   pool = mysql.createPool(process.env.MYSQL_URL + '?ssl={"rejectUnauthorized":false}');
-} else {
+} else if (process.env.MYSQLHOST) {
+  console.log('[DB] Menggunakan MYSQLHOST:', process.env.MYSQLHOST);
   pool = mysql.createPool({
-    host:     process.env.MYSQLHOST     || process.env.DB_HOST     || 'localhost',
-    port:     parseInt(process.env.MYSQLPORT || process.env.DB_PORT || '3306'),
-    user:     process.env.MYSQLUSER     || process.env.DB_USER     || 'root',
-    password: process.env.MYSQLPASSWORD || process.env.DB_PASSWORD || '',
-    database: process.env.MYSQLDATABASE || process.env.DB_NAME     || 'absensi_magang',
+    host:     process.env.MYSQLHOST,
+    port:     parseInt(process.env.MYSQLPORT || '3306'),
+    user:     process.env.MYSQLUSER,
+    password: process.env.MYSQLPASSWORD,
+    database: process.env.MYSQLDATABASE,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
-    ssl: isProduction ? { rejectUnauthorized: false } : false
+    ssl: { rejectUnauthorized: false }
+  });
+} else {
+  console.log('[DB] Menggunakan config lokal (localhost)');
+  pool = mysql.createPool({
+    host:     process.env.DB_HOST     || 'localhost',
+    port:     parseInt(process.env.DB_PORT || '3306'),
+    user:     process.env.DB_USER     || 'root',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME     || 'absensi_magang',
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
   });
 }
-
 
 async function initDb() {
   await pool.query(`
