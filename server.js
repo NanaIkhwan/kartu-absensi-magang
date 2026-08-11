@@ -11,19 +11,27 @@ const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'ganti-secret-ini-di-env';
 const TOTAL_DAYS = 90;
 
-// Support Railway MySQL plugin (MYSQL*) and local config (DB_*)
+// Support Railway MySQL plugin (MYSQL_URL or MYSQL* vars) and local config (DB_*)
 const isProduction = process.env.NODE_ENV === 'production';
-const pool = mysql.createPool({
-  host:     process.env.MYSQLHOST     || process.env.DB_HOST     || 'localhost',
-  port:     process.env.MYSQLPORT     || process.env.DB_PORT     || 3306,
-  user:     process.env.MYSQLUSER     || process.env.DB_USER     || 'root',
-  password: process.env.MYSQLPASSWORD || process.env.DB_PASSWORD || '',
-  database: process.env.MYSQLDATABASE || process.env.DB_NAME     || 'absensi_magang',
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-  ssl: isProduction ? { rejectUnauthorized: false } : false
-});
+
+let pool;
+if (process.env.MYSQL_URL) {
+  // Railway menyediakan MYSQL_URL (connection string)
+  pool = mysql.createPool(process.env.MYSQL_URL + '?ssl={"rejectUnauthorized":false}');
+} else {
+  pool = mysql.createPool({
+    host:     process.env.MYSQLHOST     || process.env.DB_HOST     || 'localhost',
+    port:     parseInt(process.env.MYSQLPORT || process.env.DB_PORT || '3306'),
+    user:     process.env.MYSQLUSER     || process.env.DB_USER     || 'root',
+    password: process.env.MYSQLPASSWORD || process.env.DB_PASSWORD || '',
+    database: process.env.MYSQLDATABASE || process.env.DB_NAME     || 'absensi_magang',
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0,
+    ssl: isProduction ? { rejectUnauthorized: false } : false
+  });
+}
+
 
 async function initDb() {
   await pool.query(`
