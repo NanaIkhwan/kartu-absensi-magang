@@ -35,9 +35,31 @@
           <input type="text" name="username" autocomplete="username" required>
         </label>
         <label>Password
-          <input type="password" name="password" autocomplete="current-password" required>
+          <div class="pwd-wrapper">
+            <input type="password" name="password" autocomplete="current-password" required>
+            <button type="button" class="eye-btn" aria-label="Toggle password visibility">👁️</button>
+          </div>
         </label>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: -6px;">
+          <button type="button" id="btnShowForgot" class="link-btn">Lupa Password?</button>
+        </div>
         <button type="submit" class="auth-submit">Masuk</button>
+      </form>
+
+      <form class="auth-form" id="forgotPasswordForm" style="display:none;">
+        <label>Username
+          <input type="text" name="username" autocomplete="username" required>
+        </label>
+        <label>Password Baru
+          <div class="pwd-wrapper">
+            <input type="password" name="new_password" autocomplete="new-password" minlength="6" required>
+            <button type="button" class="eye-btn" aria-label="Toggle password visibility">👁️</button>
+          </div>
+        </label>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: -6px;">
+          <button type="button" id="btnBackToLogin" class="link-btn">Kembali ke Login</button>
+        </div>
+        <button type="submit" class="auth-submit">Simpan Sandi Baru</button>
       </form>
 
       <form class="auth-form" id="registerForm" style="display:none;">
@@ -45,7 +67,10 @@
           <input type="text" name="username" autocomplete="username" minlength="3" required>
         </label>
         <label>Password
-          <input type="password" name="password" autocomplete="new-password" minlength="6" required>
+          <div class="pwd-wrapper">
+            <input type="password" name="password" autocomplete="new-password" minlength="6" required>
+            <button type="button" class="eye-btn" aria-label="Toggle password visibility">👁️</button>
+          </div>
         </label>
         <label>Tanggal Mulai Magang
           <input type="date" name="start_date" required>
@@ -64,6 +89,7 @@
     <header class="header app-header">
       <div class="user-row">
         <span class="user-chip" id="userChip">—</span>
+        <button class="icon-btn" id="btnSettings" aria-label="Pengaturan">⚙️</button>
         <button class="logout-btn" id="logoutBtn">Keluar</button>
       </div>
       <p class="eyebrow">Kartu Absensi — Program Magang</p>
@@ -108,6 +134,50 @@
       <p>UKMBiz QA Internship &middot; target 90 hari kerja</p>
     </footer>
 
+  </div>
+
+  <!-- ===== SETTINGS MODAL ===== -->
+  <div class="modal-overlay" id="settingsModal" style="display:none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Pengaturan Akun</h2>
+        <button class="close-modal-btn" id="btnCloseSettings">&times;</button>
+      </div>
+      
+      <div class="settings-tabs">
+        <button class="settings-tab active" id="tabChangePwd" type="button">Ganti Sandi</button>
+        <button class="settings-tab" id="tabDeleteAcc" type="button">Hapus Akun</button>
+      </div>
+
+      <form class="auth-form" id="changePasswordForm">
+        <label>Sandi Lama
+          <div class="pwd-wrapper">
+            <input type="password" name="old_password" required>
+            <button type="button" class="eye-btn">👁️</button>
+          </div>
+        </label>
+        <label>Sandi Baru
+          <div class="pwd-wrapper">
+            <input type="password" name="new_password" minlength="6" required>
+            <button type="button" class="eye-btn">👁️</button>
+          </div>
+        </label>
+        <p class="auth-error" id="changePwdError"></p>
+        <button type="submit" class="auth-submit">Simpan Perubahan</button>
+      </form>
+
+      <form class="auth-form" id="deleteAccountForm" style="display:none;">
+        <p class="danger-text">Semua data absensi 90 hari akan terhapus dan tidak dapat dikembalikan!</p>
+        <label>Konfirmasi Sandi Anda
+          <div class="pwd-wrapper">
+            <input type="password" name="password" required>
+            <button type="button" class="eye-btn">👁️</button>
+          </div>
+        </label>
+        <p class="auth-error" id="deleteAccError"></p>
+        <button type="submit" class="auth-submit danger-btn">Hapus Akun Secara Permanen</button>
+      </form>
+    </div>
   </div>
 
 <script src="script.js"></script>

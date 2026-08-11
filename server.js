@@ -141,6 +141,67 @@ app.get('/api/me', auth, (req, res) => {
   res.json({ username: req.username, start_date: req.startDate });
 });
 
+app.post('/api/forgot-password', async (req, res) => {
+  const { username, new_password } = req.body || {};
+  if (!username || !new_password) return res.status(400).json({ error: 'Username dan password baru wajib diisi' });
+  if (new_password.length < 6) return res.status(400).json({ error: 'Password minimal 6 karakter' });
+
+  try {
+    const existing = await pool.query('SELECT id FROM users WHERE username = $1', [username]);
+    if (existing.rows.length === 0) return res.status(404).json({ error: 'Akun tidak ditemukan' });
+
+    const hash = await bcrypt.hash(new_password, 10);
+    await pool.query('UPDATE users SET password_hash = $1 WHERE username = $2', [hash, username]);
+    res.json({ ok: true });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Gagal reset password' });
+  }
+});
+
+app.post('/api/change-password', auth, async (req, res) => {
+  const { old_password, new_password } = req.body || {};
+  if (!old_password || !new_password) return res.status(400).json({ error: 'Password lama dan baru wajib diisi' });
+  if (new_password.length < 6) return res.status(400).json({ error: 'Password baru minimal 6 karakter' });
+
+  try {
+    const result = await pool.query('SELECT password_hash FROM users WHERE id = $1', [req.userId]);
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Akun tidak ditemukan' });
+
+    const user = result.rows[0];
+    const match = await bcrypt.compare(old_password, user.password_hash);
+    if (!match) return res.status(401).json({ error: 'Password lama salah' });
+
+    const hash = await bcrypt.hash(new_password, 10);
+    await pool.query('UPDATE users SET password_hash = $1 WHERE id = $2', [hash, req.userId]);
+    res.json({ ok: true });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Gagal mengubah password' });
+  }
+});
+
+app.post('/api/delete-account', auth, async (req, res) => {
+  const { password } = req.body || {};
+  if (!password) return res.status(400).json({ error: 'Password wajib diisi untuk konfirmasi' });
+
+  try {
+    const result = await pool.query('SELECT password_hash FROM users WHERE id = $1', [req.userId]);
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Akun tidak ditemukan' });
+
+    const user = result.rows[0];
+    const match = await bcrypt.compare(password, user.password_hash);
+    if (!match) return res.status(401).json({ error: 'Password salah, gagal menghapus akun' });
+
+    await pool.query('DELETE FROM users WHERE id = $1', [req.userId]);
+    res.clearCookie('token');
+    res.json({ ok: true });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Gagal menghapus akun' });
+  }
+});
+
 // ---- Attendance routes ----
 
 app.get('/api/attendance', auth, async (req, res) => {

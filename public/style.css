@@ -556,3 +556,129 @@ body {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* ===== Form Additions ===== */
+.link-btn {
+  background: none;
+  border: none;
+  color: var(--stamp);
+  font-size: 11px;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  font-family: 'Space Grotesk', sans-serif;
+}
+.link-btn:hover { color: var(--stamp-dark); }
+
+.pwd-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.pwd-wrapper input {
+  width: 100%;
+  padding-right: 40px;
+}
+.eye-btn {
+  position: absolute;
+  right: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  opacity: 0.6;
+  padding: 4px;
+  transition: opacity 0.2s;
+}
+.eye-btn:hover { opacity: 1; }
+
+/* ===== Modal ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.modal-content {
+  background: var(--paper);
+  color: var(--ink);
+  width: 90%;
+  max-width: 400px;
+  border-radius: var(--radius);
+  padding: 24px;
+  border: 1px solid var(--line);
+  box-shadow: 0 20px 40px -10px rgba(0,0,0,0.8);
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.modal-header h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  margin: 0;
+  font-size: 20px;
+}
+.close-modal-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  line-height: 1;
+  color: var(--ink-soft);
+}
+.close-modal-btn:hover { color: var(--stamp); }
+
+.settings-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  background: var(--paper-dim);
+  padding: 4px;
+  border-radius: var(--radius);
+}
+.settings-tab {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 8px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  color: var(--ink-soft);
+  cursor: pointer;
+  border-radius: 3px;
+}
+.settings-tab.active {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.danger-text {
+  font-size: 12px;
+  color: var(--stamp);
+  margin: 0 0 10px;
+  line-height: 1.4;
+  font-weight: 600;
+}
+.danger-btn {
+  background: var(--stamp) !important;
+}
+.icon-btn {
+  background: none;
+  border: 1px solid #3A4657;
+  color: #9AA3AF;
+  font-size: 12px;
+  padding: 5px 8px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.icon-btn:hover {
+  background: var(--ink);
+  color: var(--paper);
+}

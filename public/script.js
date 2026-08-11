@@ -58,6 +58,35 @@ const resetBtn = document.getElementById('resetBtn');
 
 let doneDays = new Set();
 
+const btnShowForgot = document.getElementById('btnShowForgot');
+const btnBackToLogin = document.getElementById('btnBackToLogin');
+const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+
+const btnSettings = document.getElementById('btnSettings');
+const settingsModal = document.getElementById('settingsModal');
+const btnCloseSettings = document.getElementById('btnCloseSettings');
+
+const tabChangePwd = document.getElementById('tabChangePwd');
+const tabDeleteAcc = document.getElementById('tabDeleteAcc');
+const changePasswordForm = document.getElementById('changePasswordForm');
+const deleteAccountForm = document.getElementById('deleteAccountForm');
+const changePwdError = document.getElementById('changePwdError');
+const deleteAccError = document.getElementById('deleteAccError');
+
+// ---------- Password Visibility Toggle ----------
+document.querySelectorAll('.eye-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const input = btn.previousElementSibling;
+    if (input.type === 'password') {
+      input.type = 'text';
+      btn.textContent = '🙈';
+    } else {
+      input.type = 'password';
+      btn.textContent = '👁️';
+    }
+  });
+});
+
 // ---------- Auth tab switching ----------
 
 tabLogin.addEventListener('click', () => {
@@ -65,6 +94,28 @@ tabLogin.addEventListener('click', () => {
   tabRegister.classList.remove('active');
   loginForm.style.display = 'flex';
   registerForm.style.display = 'none';
+  forgotPasswordForm.style.display = 'none';
+  authError.textContent = '';
+});
+
+tabRegister.addEventListener('click', () => {
+  tabRegister.classList.add('active');
+  tabLogin.classList.remove('active');
+  registerForm.style.display = 'flex';
+  loginForm.style.display = 'none';
+  forgotPasswordForm.style.display = 'none';
+  authError.textContent = '';
+});
+
+btnShowForgot.addEventListener('click', () => {
+  loginForm.style.display = 'none';
+  forgotPasswordForm.style.display = 'flex';
+  authError.textContent = '';
+});
+
+btnBackToLogin.addEventListener('click', () => {
+  forgotPasswordForm.style.display = 'none';
+  loginForm.style.display = 'flex';
   authError.textContent = '';
 });
 
@@ -128,6 +179,23 @@ registerForm.addEventListener('submit', async (e) => {
   }
 });
 
+forgotPasswordForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  authError.textContent = '';
+  const fd = new FormData(forgotPasswordForm);
+  try {
+    await apiPost('/api/forgot-password', {
+      username: fd.get('username'),
+      new_password: fd.get('new_password')
+    });
+    alert('Password berhasil direset. Silakan login kembali.');
+    btnBackToLogin.click();
+    forgotPasswordForm.reset();
+  } catch (err) {
+    authError.textContent = err.message;
+  }
+});
+
 logoutBtn.addEventListener('click', async () => {
   await apiPost('/api/logout');
   doneDays = new Set();
@@ -135,6 +203,78 @@ logoutBtn.addEventListener('click', async () => {
   authScreen.style.display = 'block';
   loginForm.reset();
   registerForm.reset();
+  forgotPasswordForm.reset();
+});
+
+// ---------- Settings Modal ----------
+
+btnSettings.addEventListener('click', () => {
+  settingsModal.style.display = 'flex';
+  changePwdError.textContent = '';
+  deleteAccError.textContent = '';
+});
+
+btnCloseSettings.addEventListener('click', () => {
+  settingsModal.style.display = 'none';
+  changePasswordForm.reset();
+  deleteAccountForm.reset();
+});
+
+tabChangePwd.addEventListener('click', () => {
+  tabChangePwd.classList.add('active');
+  tabDeleteAcc.classList.remove('active');
+  changePasswordForm.style.display = 'flex';
+  deleteAccountForm.style.display = 'none';
+  changePwdError.textContent = '';
+});
+
+tabDeleteAcc.addEventListener('click', () => {
+  tabDeleteAcc.classList.add('active');
+  tabChangePwd.classList.remove('active');
+  deleteAccountForm.style.display = 'flex';
+  changePasswordForm.style.display = 'none';
+  deleteAccError.textContent = '';
+});
+
+changePasswordForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  changePwdError.textContent = '';
+  const fd = new FormData(changePasswordForm);
+  try {
+    await apiPost('/api/change-password', {
+      old_password: fd.get('old_password'),
+      new_password: fd.get('new_password')
+    });
+    alert('Password berhasil diubah!');
+    btnCloseSettings.click();
+  } catch (err) {
+    changePwdError.textContent = err.message;
+  }
+});
+
+deleteAccountForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  deleteAccError.textContent = '';
+  const fd = new FormData(deleteAccountForm);
+  
+  if (!confirm('Peringatan: Aksi ini tidak dapat dibatalkan! Yakin ingin menghapus akun?')) return;
+  
+  try {
+    await apiPost('/api/delete-account', {
+      password: fd.get('password')
+    });
+    alert('Akun berhasil dihapus secara permanen.');
+    btnCloseSettings.click();
+    
+    // reset UI to login
+    doneDays = new Set();
+    appScreen.style.display = 'none';
+    authScreen.style.display = 'block';
+    loginForm.reset();
+    registerForm.reset();
+  } catch (err) {
+    deleteAccError.textContent = err.message;
+  }
 });
 
 // ---------- App logic ----------
