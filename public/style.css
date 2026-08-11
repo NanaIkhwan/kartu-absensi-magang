@@ -115,7 +115,7 @@ body {
   color: var(--ink-soft);
 }
 
-.auth-form input {
+.auth-form input, .auth-form select {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 14px;
   padding: 10px 12px;
@@ -125,7 +125,7 @@ body {
   color: var(--ink);
 }
 
-.auth-form input:focus {
+.auth-form input:focus, .auth-form select:focus {
   outline: 2px solid var(--gold);
   outline-offset: 1px;
 }

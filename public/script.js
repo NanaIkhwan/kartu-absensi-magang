@@ -14,7 +14,7 @@ function toDateStr(d) {
 let validWorkingDays = [];
 let dateToDayNumber = {};
 
-function initCalendar(startDateStr) {
+function initCalendar(startDateStr, workDays = 6) {
   validWorkingDays = [];
   dateToDayNumber = {};
 
@@ -22,7 +22,16 @@ function initCalendar(startDateStr) {
   let dayCount = 1;
   while (dayCount <= TOTAL_DAYS) {
     const str = toDateStr(currDate);
-    if (currDate.getDay() !== 0 && !HOLIDAYS.includes(str)) {
+    const dayOfWeek = currDate.getDay();
+    
+    let isWeekend = false;
+    if (workDays === 5) {
+      isWeekend = (dayOfWeek === 0 || dayOfWeek === 6); // Minggu dan Sabtu
+    } else {
+      isWeekend = (dayOfWeek === 0); // Hanya Minggu
+    }
+
+    if (!isWeekend && !HOLIDAYS.includes(str)) {
       validWorkingDays.push(new Date(currDate));
       dateToDayNumber[str] = dayCount;
       dayCount++;
@@ -171,7 +180,8 @@ registerForm.addEventListener('submit', async (e) => {
     const data = await apiPost('/api/register', {
       username: fd.get('username'),
       password: fd.get('password'),
-      start_date: fd.get('start_date')
+      start_date: fd.get('start_date'),
+      work_days: fd.get('work_days')
     });
     await enterApp(data);
   } catch (err) {
@@ -281,7 +291,7 @@ deleteAccountForm.addEventListener('submit', async (e) => {
 
 async function enterApp(userData) {
   userChip.textContent = userData.username;
-  initCalendar(userData.start_date || '2026-07-27');
+  initCalendar(userData.start_date || '2026-07-27', userData.work_days || 6);
   authScreen.style.display = 'none';
   appScreen.style.display = 'block';
   await loadAttendance();

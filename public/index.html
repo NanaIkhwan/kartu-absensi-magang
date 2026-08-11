@@ -72,10 +72,16 @@
             <button type="button" class="eye-btn" aria-label="Toggle password visibility">👁️</button>
           </div>
         </label>
+        <label>Sistem Hari Kerja
+          <select name="work_days" required>
+            <option value="6">6 Hari Kerja (Senin - Sabtu)</option>
+            <option value="5">5 Hari Kerja (Senin - Jumat)</option>
+          </select>
+        </label>
         <label>Tanggal Mulai Magang
           <input type="date" name="start_date" required>
         </label>
-        <p class="auth-hint">Password minimal 6 karakter. Tanggal akan dipakai buat jadwal kalender 90 hari kerjamu.</p>
+        <p class="auth-hint">Sistem kerja dan tanggal awal menentukan perhitungan jadwal libur kalendermu secara otomatis.</p>
         <button type="submit" class="auth-submit">Buat Akun</button>
       </form>
 
