@@ -35,6 +35,9 @@ async function initDb() {
       );
     `);
     await pool.query(`
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS start_date DATE DEFAULT '2026-07-27';
+    `);
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS attendance (
         user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
         day_number INTEGER NOT NULL,
@@ -57,6 +60,7 @@ function auth(req, res, next) {
     const payload = jwt.verify(token, JWT_SECRET);
     req.userId = payload.userId;
     req.username = payload.username;
+    req.startDate = payload.startDate;
     next();
   } catch (e) {
     return res.status(401).json({ error: 'Sesi tidak valid, silakan login lagi' });
@@ -64,7 +68,11 @@ function auth(req, res, next) {
 }
 
 function setAuthCookie(res, user) {
-  const token = jwt.sign({ userId: user.id, username: user.username }, JWT_SECRET, { expiresIn: '30d' });
+  const token = jwt.sign({ 
+    userId: user.id, 
+    username: user.username,
+    startDate: user.start_date
+  }, JWT_SECRET, { expiresIn: '30d' });
   res.cookie('token', token, {
     httpOnly: true,
     sameSite: 'lax',
@@ -76,10 +84,15 @@ function setAuthCookie(res, user) {
 // ---- Auth routes ----
 
 app.post('/api/register', async (req, res) => {
-  const { username, password } = req.body || {};
+  const { username, password, start_date } = req.body || {};
   if (!username || !password) return res.status(400).json({ error: 'Username dan password wajib diisi' });
   if (username.length < 3) return res.status(400).json({ error: 'Username minimal 3 karakter' });
   if (password.length < 6) return res.status(400).json({ error: 'Password minimal 6 karakter' });
+  
+  let validStartDate = '2026-07-27'; // default
+  if (start_date && !isNaN(new Date(start_date).getTime())) {
+    validStartDate = start_date;
+  }
 
   try {
     const existing = await pool.query('SELECT id FROM users WHERE username = $1', [username]);
@@ -87,12 +100,12 @@ app.post('/api/register', async (req, res) => {
 
     const hash = await bcrypt.hash(password, 10);
     const result = await pool.query(
-      'INSERT INTO users (username, password_hash) VALUES ($1, $2) RETURNING id, username',
-      [username, hash]
+      'INSERT INTO users (username, password_hash, start_date) VALUES ($1, $2, $3) RETURNING id, username, start_date',
+      [username, hash, validStartDate]
     );
     const user = result.rows[0];
     setAuthCookie(res, user);
-    res.json({ username: user.username });
+    res.json({ username: user.username, start_date: user.start_date });
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: 'Gagal membuat akun, coba lagi' });
@@ -104,7 +117,7 @@ app.post('/api/login', async (req, res) => {
   if (!username || !password) return res.status(400).json({ error: 'Username dan password wajib diisi' });
 
   try {
-    const result = await pool.query('SELECT id, username, password_hash FROM users WHERE username = $1', [username]);
+    const result = await pool.query('SELECT id, username, password_hash, start_date FROM users WHERE username = $1', [username]);
     if (result.rows.length === 0) return res.status(401).json({ error: 'Username atau password salah' });
 
     const user = result.rows[0];
@@ -112,7 +125,7 @@ app.post('/api/login', async (req, res) => {
     if (!match) return res.status(401).json({ error: 'Username atau password salah' });
 
     setAuthCookie(res, user);
-    res.json({ username: user.username });
+    res.json({ username: user.username, start_date: user.start_date });
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: 'Gagal login, coba lagi' });
@@ -125,7 +138,7 @@ app.post('/api/logout', (req, res) => {
 });
 
 app.get('/api/me', auth, (req, res) => {
-  res.json({ username: req.username });
+  res.json({ username: req.username, start_date: req.startDate });
 });
 
 // ---- Attendance routes ----

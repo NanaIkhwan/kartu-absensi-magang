@@ -1,6 +1,5 @@
 const TOTAL_DAYS = 90;
 
-const START_DATE = new Date(2026, 6, 27); // 27 July 2026
 const HOLIDAYS = ['2026-08-17', '2026-08-25'];
 const MONTHS = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
 const WEEKDAYS = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
@@ -12,11 +11,14 @@ function toDateStr(d) {
   return `${yyyy}-${mm}-${dd}`;
 }
 
-const validWorkingDays = [];
-const dateToDayNumber = {};
+let validWorkingDays = [];
+let dateToDayNumber = {};
 
-function initCalendar() {
-  let currDate = new Date(START_DATE);
+function initCalendar(startDateStr) {
+  validWorkingDays = [];
+  dateToDayNumber = {};
+
+  let currDate = new Date(startDateStr);
   let dayCount = 1;
   while (dayCount <= TOTAL_DAYS) {
     const str = toDateStr(currDate);
@@ -28,7 +30,6 @@ function initCalendar() {
     currDate.setDate(currDate.getDate() + 1);
   }
 }
-initCalendar();
 
 function formatDateShort(d) {
   return `${d.getDate()} ${MONTHS[d.getMonth()].slice(0,3)}`;
@@ -105,7 +106,7 @@ loginForm.addEventListener('submit', async (e) => {
       username: fd.get('username'),
       password: fd.get('password')
     });
-    await enterApp(data.username);
+    await enterApp(data);
   } catch (err) {
     authError.textContent = err.message;
   }
@@ -118,9 +119,10 @@ registerForm.addEventListener('submit', async (e) => {
   try {
     const data = await apiPost('/api/register', {
       username: fd.get('username'),
-      password: fd.get('password')
+      password: fd.get('password'),
+      start_date: fd.get('start_date')
     });
-    await enterApp(data.username);
+    await enterApp(data);
   } catch (err) {
     authError.textContent = err.message;
   }
@@ -137,8 +139,9 @@ logoutBtn.addEventListener('click', async () => {
 
 // ---------- App logic ----------
 
-async function enterApp(username) {
-  userChip.textContent = username;
+async function enterApp(userData) {
+  userChip.textContent = userData.username;
+  initCalendar(userData.start_date || '2026-07-27');
   authScreen.style.display = 'none';
   appScreen.style.display = 'block';
   await loadAttendance();
@@ -149,7 +152,7 @@ async function loadAttendance() {
     const data = await apiGet('/api/attendance');
     doneDays = new Set(data.days);
     buildGrid();
-    render();
+    render(true);
   } catch (err) {
     authError.textContent = '';
     console.error(err);
@@ -306,7 +309,7 @@ function nextEmptyDay() {
   return null;
 }
 
-function render() {
+function render(isInitialLoad = false) {
   const done = doneDays.size;
   const percent = Math.round((done / TOTAL_DAYS) * 100);
 
@@ -327,10 +330,25 @@ function render() {
   if (next === null) {
     stampTodayBtn.disabled = true;
     nextDayLabelEl.textContent = 'Semua hari sudah dicap';
+    
+    // Auto focus to last month if completed
+    if (isInitialLoad && monthBlocks.length > 0) {
+      showMonth(monthBlocks.length - 1);
+    }
   } else {
     stampTodayBtn.disabled = false;
     const nextDate = validWorkingDays[next - 1];
     nextDayLabelEl.textContent = `Hari ke-${next} (${formatDateShort(nextDate)})`;
+    
+    // Auto focus to the month containing nextDate
+    if (isInitialLoad) {
+      const targetYear = nextDate.getFullYear();
+      const targetMonth = nextDate.getMonth();
+      const targetIndex = monthBlocks.findIndex(b => 
+        parseInt(b.dataset.year) === targetYear && parseInt(b.dataset.month) === targetMonth
+      );
+      if (targetIndex !== -1) showMonth(targetIndex);
+    }
   }
 
   document.querySelectorAll('.day').forEach((cell) => {
@@ -363,7 +381,7 @@ const loadingOverlay = document.getElementById('loadingOverlay');
 (async function init() {
   try {
     const me = await apiGet('/api/me');
-    await enterApp(me.username);
+    await enterApp(me);
   } catch (err) {
     authScreen.style.display = 'block';
     appScreen.style.display = 'none';
