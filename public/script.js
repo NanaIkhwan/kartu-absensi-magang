@@ -358,6 +358,8 @@ resetBtn.addEventListener('click', async () => {
 
 // ---------- Init: check existing session ----------
 
+const loadingOverlay = document.getElementById('loadingOverlay');
+
 (async function init() {
   try {
     const me = await apiGet('/api/me');
@@ -365,5 +367,7 @@ resetBtn.addEventListener('click', async () => {
   } catch (err) {
     authScreen.style.display = 'block';
     appScreen.style.display = 'none';
+  } finally {
+    if (loadingOverlay) loadingOverlay.style.display = 'none';
   }
 })();
