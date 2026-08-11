@@ -22,23 +22,28 @@ const pool = new Pool({
   ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
 });
 
+let dbReady = null;
 async function initDb() {
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS users (
-      id SERIAL PRIMARY KEY,
-      username TEXT UNIQUE NOT NULL,
-      password_hash TEXT NOT NULL,
-      created_at TIMESTAMP DEFAULT NOW()
-    );
-  `);
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS attendance (
-      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-      day_number INTEGER NOT NULL,
-      checked_at TIMESTAMP DEFAULT NOW(),
-      PRIMARY KEY (user_id, day_number)
-    );
-  `);
+  if (dbReady) return dbReady;
+  dbReady = (async () => {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        username TEXT UNIQUE NOT NULL,
+        password_hash TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT NOW()
+      );
+    `);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS attendance (
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        day_number INTEGER NOT NULL,
+        checked_at TIMESTAMP DEFAULT NOW(),
+        PRIMARY KEY (user_id, day_number)
+      );
+    `);
+  })();
+  return dbReady;
 }
 
 app.use(express.json());
@@ -176,11 +181,21 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-initDb()
-  .then(() => {
-    app.listen(PORT, () => console.log(`Server jalan di port ${PORT}`));
-  })
-  .catch((err) => {
-    console.error('Gagal init database:', err.message);
-    process.exit(1);
-  });
+// Middleware untuk pastikan DB sudah siap sebelum handle request
+app.use(async (req, res, next) => {
+  try {
+    await initDb();
+    next();
+  } catch (err) {
+    console.error('DB init error:', err.message);
+    res.status(500).json({ error: 'Database tidak tersedia' });
+  }
+});
+
+// Vercel: export app sebagai serverless function
+// Lokal / Railway: jalankan server biasa
+if (require.main === module) {
+  app.listen(PORT, () => console.log(`Server jalan di port ${PORT}`));
+}
+
+module.exports = app;
