@@ -1,6 +1,11 @@
 const TOTAL_DAYS = 90;
 
-const HOLIDAYS = ['2026-08-17', '2026-08-25'];
+const HOLIDAYS = {
+  '2026-08-17': 'HUT RI ke-81',
+  '2026-08-25': 'Cuti Bersama',
+  '2026-09-04': 'Maulid Nabi', // contoh libur september
+  '2026-12-25': 'Hari Natal'
+};
 const MONTHS = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
 const WEEKDAYS = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
 
@@ -31,7 +36,7 @@ function initCalendar(startDateStr, workDays = 6) {
       isWeekend = (dayOfWeek === 0); // Hanya Minggu
     }
 
-    if (!isWeekend && !HOLIDAYS.includes(str)) {
+    if (!isWeekend && !HOLIDAYS[str]) {
       validWorkingDays.push(new Date(currDate));
       dateToDayNumber[str] = dayCount;
       dayCount++;
@@ -374,7 +379,8 @@ function buildMonthBlock(year, month) {
     cell.className = 'day';
 
     const isSunday = cellDate.getDay() === 0;
-    const isHoliday = HOLIDAYS.includes(str);
+    const isSaturday = cellDate.getDay() === 6;
+    const holidayName = HOLIDAYS[str];
     const dayNum = dateToDayNumber[str];
 
     if (dayNum) {
@@ -401,8 +407,10 @@ function buildMonthBlock(year, month) {
 
       const labelSpan = document.createElement('span');
       labelSpan.className = 'cal-label';
-      if ((isHoliday || isSunday) && (cellDate >= startDate && cellDate <= endDate)) {
-        labelSpan.textContent = 'Libur';
+      // If it reaches here, it's NOT a valid working day (either weekend or holiday)
+      // Check if it's within the internship period to color it red
+      if (cellDate >= startDate && cellDate <= endDate) {
+        labelSpan.textContent = holidayName || 'Libur';
         cell.classList.add('libur');
       }
       cell.appendChild(labelSpan);

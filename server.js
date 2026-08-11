@@ -222,7 +222,12 @@ app.get('/api/attendance', auth, async (req, res) => {
   }
 });
 
-const HOLIDAYS = ['2026-08-17', '2026-08-25'];
+const HOLIDAYS = {
+  '2026-08-17': 'HUT RI ke-81',
+  '2026-08-25': 'Cuti Bersama',
+  '2026-09-04': 'Maulid Nabi', 
+  '2026-12-25': 'Hari Natal'
+};
 
 function getWorkingDate(startDateStr, workDays, targetDayNumber) {
   let currDate = new Date(startDateStr);
@@ -236,7 +241,7 @@ function getWorkingDate(startDateStr, workDays, targetDayNumber) {
     const dayOfWeek = currDate.getDay();
     let isWeekend = (workDays === 5) ? (dayOfWeek === 0 || dayOfWeek === 6) : (dayOfWeek === 0);
     
-    if (!isWeekend && !HOLIDAYS.includes(str)) {
+    if (!isWeekend && !HOLIDAYS[str]) {
       if (dayCount === targetDayNumber) return new Date(currDate);
       dayCount++;
     }
