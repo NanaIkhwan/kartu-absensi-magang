@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kartu Absensi Magang</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ===== AUTH SCREEN ===== -->
+  <div class="wrap auth-wrap" id="authScreen">
+    <header class="header">
+      <p class="eyebrow">Kartu Absensi — Program Magang</p>
+      <h1 class="title">90 Hari Kerja</h1>
+      <p class="sub">Login atau buat akun dulu buat mulai mencatat kehadiran.</p>
+    </header>
+
+    <section class="auth-panel">
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabLogin" type="button">Login</button>
+        <button class="auth-tab" id="tabRegister" type="button">Daftar Akun</button>
+      </div>
+
+      <form class="auth-form" id="loginForm">
+        <label>Username
+          <input type="text" name="username" autocomplete="username" required>
+        </label>
+        <label>Password
+          <input type="password" name="password" autocomplete="current-password" required>
+        </label>
+        <button type="submit" class="auth-submit">Masuk</button>
+      </form>
+
+      <form class="auth-form" id="registerForm" style="display:none;">
+        <label>Username
+          <input type="text" name="username" autocomplete="username" minlength="3" required>
+        </label>
+        <label>Password
+          <input type="password" name="password" autocomplete="new-password" minlength="6" required>
+        </label>
+        <p class="auth-hint">Password minimal 6 karakter.</p>
+        <button type="submit" class="auth-submit">Buat Akun</button>
+      </form>
+
+      <p class="auth-error" id="authError"></p>
+    </section>
+  </div>
+
+  <!-- ===== APP SCREEN ===== -->
+  <div class="wrap" id="appScreen" style="display:none;">
+
+    <header class="header app-header">
+      <div class="user-row">
+        <span class="user-chip" id="userChip">—</span>
+        <button class="logout-btn" id="logoutBtn">Keluar</button>
+      </div>
+      <p class="eyebrow">Kartu Absensi — Program Magang</p>
+      <h1 class="title">90 Hari Kerja</h1>
+      <p class="sub">Klik kotak untuk cap kehadiran hari itu. Data tersimpan di server, aman diakses dari device mana pun.</p>
+    </header>
+
+    <section class="stamp-panel" id="stampPanel">
+      <button class="stamp-btn" id="stampToday">
+        <span class="stamp-btn-label">Cap Hadir Hari Ini</span>
+        <span class="stamp-btn-sub" id="nextDayLabel">Hari ke-1</span>
+      </button>
+
+      <div class="progress-block">
+        <div class="progress-numbers">
+          <span class="progress-percent" id="progressPercent">0%</span>
+          <span class="progress-fraction" id="progressFraction">0 / 90 hari</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <p class="progress-note" id="progressNote">Belum ada hari yang tercatat. Mulai dari hari ke-1.</p>
+      </div>
+    </section>
+
+    <section class="ledger">
+      <div class="ledger-head">
+        <h2>Buku Absen</h2>
+        <button class="reset-btn" id="resetBtn">Reset semua</button>
+      </div>
+
+      <div class="calendar-controls">
+        <button class="cal-nav-btn" id="prevMonthBtn" aria-label="Bulan sebelumnya">&#8249;</button>
+        <span class="cal-month-label" id="calMonthLabel">—</span>
+        <button class="cal-nav-btn" id="nextMonthBtn" aria-label="Bulan selanjutnya">&#8250;</button>
+      </div>
+
+      <div class="grid" id="grid"></div>
+    </section>
+
+    <footer class="footer">
+      <p>UKMBiz QA Internship &middot; target 90 hari kerja</p>
+    </footer>
+
+  </div>
+
+<script src="script.js"></script>
+</body>
+</html>

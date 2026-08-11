@@ -1,35 +1,59 @@
-# Kartu Absensi Magang — 90 Hari Kerja
+# Kartu Absensi Magang — 90 Hari Kerja (dengan Login & Database)
 
-Web sederhana buat checklist kehadiran magang, dengan progress % dan target 90 hari kerja.
+Web app buat checklist kehadiran magang. Sekarang sudah pakai:
+- **Login & daftar akun** (password di-hash pakai bcrypt, sesi pakai cookie httpOnly)
+- **Database PostgreSQL** — jadi data absensi tersimpan di server, bukan cuma di browser
+- Progress % otomatis, target 90 hari kerja
 
-## Isi folder
-- `index.html` — halaman utama
-- `style.css` — semua styling
-- `script.js` — logika checklist & penyimpanan data
-- `vercel.json` — konfigurasi deploy Vercel
-
-## Cara Deploy ke Vercel
-
-### Opsi 1 — Lewat website Vercel (paling gampang, tanpa install apa-apa)
-1. Buat akun/login di https://vercel.com (bisa pakai akun GitHub)
-2. Upload folder ini ke repo GitHub baru (drag & drop lewat github.com juga bisa)
-3. Di dashboard Vercel, klik **Add New → Project**
-4. Pilih repo GitHub tadi, lalu klik **Deploy**
-5. Framework Preset pilih **Other** (karena ini static HTML biasa, tanpa build step)
-6. Tunggu proses deploy selesai, nanti dapat link seperti `https://nama-project.vercel.app`
-
-### Opsi 2 — Lewat Vercel CLI (kalau punya Node.js)
-```bash
-npm install -g vercel
-cd folder-absensi-ini
-vercel
+## Struktur folder
 ```
-Ikuti pertanyaan yang muncul (login, nama project, dst), lalu jalankan `vercel --prod` untuk deploy ke production.
+absensi-app/
+├── server.js          # backend Express + API
+├── package.json
+├── .env.example        # contoh environment variable
+├── public/
+│   ├── index.html      # halaman login + halaman absensi
+│   ├── style.css
+│   └── script.js
+```
 
-## Catatan penting
-Data kehadiran disimpan di **localStorage browser**, artinya:
-- Data tersimpan per browser/device, bukan di server
-- Kalau buka dari HP dan laptop, datanya beda (tidak otomatis sinkron)
-- Kalau hapus cache/data browser, checklist akan ikut hilang
+## Cara Deploy ke Railway
 
-Kalau nanti mau data tersimpan di server dan bisa diakses dari device mana pun, kasih tahu ya — bisa ditambahkan penyimpanan berbasis database.
+### 1. Push folder ini ke GitHub
+Buat repo baru, push semua file di folder ini (kecuali `node_modules` dan `.env`, sudah di-ignore lewat `.gitignore`).
+
+### 2. Buat project di Railway
+1. Login ke https://railway.app
+2. Klik **New Project → Deploy from GitHub repo**
+3. Pilih repo yang tadi kamu push
+4. Railway otomatis mendeteksi ini project Node.js (baca `package.json`, jalankan `npm start`)
+
+### 3. Tambahkan database PostgreSQL
+1. Di dalam project yang sama, klik **+ New → Database → Add PostgreSQL**
+2. Railway otomatis membuat variabel `DATABASE_URL` dan menghubungkannya ke service kamu (biasanya otomatis linked; kalau belum, buka tab **Variables** di service backend dan tambahkan reference ke `DATABASE_URL` dari service Postgres)
+
+### 4. Set environment variable
+Di tab **Variables** service backend, tambahkan:
+- `JWT_SECRET` — isi string acak yang panjang & rahasia (contoh bisa generate pakai `openssl rand -hex 32` di terminal)
+- `NODE_ENV` = `production`
+
+`DATABASE_URL` dan `PORT` biasanya sudah otomatis diisi Railway.
+
+### 5. Deploy
+Railway otomatis build & jalankan tiap kali kamu push ke GitHub. Setelah deploy sukses, buka tab **Settings → Networking** untuk generate domain publik (misalnya `https://absensi-magang.up.railway.app`).
+
+## Coba di lokal (opsional, sebelum deploy)
+```bash
+npm install
+cp .env.example .env
+# isi DATABASE_URL pakai Postgres lokal atau dari Railway, isi JWT_SECRET bebas
+npm start
+```
+Buka `http://localhost:3000`.
+
+## Cara kerja datanya
+- Tabel `users` — menyimpan username & password (sudah di-hash, bukan plain text)
+- Tabel `attendance` — menyimpan hari ke berapa yang sudah dicap, per user
+- Tiap user cuma bisa lihat & ubah data absensinya sendiri (dicek lewat cookie login)
+
+Kalau nanti mau ditambah fitur, misal supervisor punya akun khusus buat lihat progres semua intern sekaligus, tinggal bilang ya.

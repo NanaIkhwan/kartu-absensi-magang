@@ -1,0 +1,21 @@
+{
+  "name": "absensi-magang",
+  "version": "1.0.0",
+  "description": "Kartu absensi magang 90 hari kerja dengan login & database",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.23.3"
+  }
+}
