@@ -1,10 +1,31 @@
 const TOTAL_DAYS = 90;
 
 const HOLIDAYS = {
-  '2026-08-17': 'HUT RI ke-81',
-  '2026-08-25': 'Cuti Bersama',
-  '2026-09-04': 'Maulid Nabi', // contoh libur september
-  '2026-12-25': 'Hari Natal'
+  '2026-01-01': 'Tahun Baru Masehi',
+  '2026-01-16': 'Isra Mikraj',
+  '2026-02-16': 'Cuti Bersama Imlek',
+  '2026-02-17': 'Tahun Baru Imlek',
+  '2026-03-18': 'Cuti Bersama Nyepi',
+  '2026-03-19': 'Hari Suci Nyepi',
+  '2026-03-20': 'Cuti Bersama Idul Fitri',
+  '2026-03-21': 'Hari Raya Idul Fitri',
+  '2026-03-22': 'Hari Raya Idul Fitri',
+  '2026-03-23': 'Cuti Bersama Idul Fitri',
+  '2026-03-24': 'Cuti Bersama Idul Fitri',
+  '2026-04-03': 'Wafat Yesus Kristus',
+  '2026-04-05': 'Paskah',
+  '2026-05-01': 'Hari Buruh Internasional',
+  '2026-05-14': 'Kenaikan Yesus Kristus',
+  '2026-05-15': 'Cuti Kenaikan Yesus',
+  '2026-05-27': 'Hari Raya Idul Adha',
+  '2026-05-28': 'Cuti Bersama Idul Adha',
+  '2026-05-31': 'Hari Raya Waisak',
+  '2026-06-01': 'Hari Lahir Pancasila',
+  '2026-06-16': 'Tahun Baru Islam',
+  '2026-08-17': 'HUT Kemerdekaan RI',
+  '2026-08-25': 'Maulid Nabi Muhammad',
+  '2026-12-24': 'Cuti Bersama Natal',
+  '2026-12-25': 'Hari Raya Natal'
 };
 const MONTHS = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
 const WEEKDAYS = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
