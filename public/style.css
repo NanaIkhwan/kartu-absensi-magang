@@ -1,15 +1,17 @@
 :root {
-  --bg: #1B2430;
-  --bg-vignette: #10161f;
-  --paper: #EFE9DD;
-  --paper-dim: #E2DACB;
-  --ink: #26333F;
-  --ink-soft: #5B6672;
-  --stamp: #B23A2F;
-  --stamp-dark: #8C2C22;
-  --gold: #C9A227;
-  --line: #C9C0AC;
-  --radius: 4px;
+  --bg-dark: #0B0F19;
+  --glass-bg: rgba(17, 24, 39, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.5);
+  --text-main: #F3F4F6;
+  --text-dim: #9CA3AF;
+  --accent-primary: #3B82F6;
+  --accent-glow: #60A5FA;
+  --stamp: #F43F5E;
+  --stamp-dark: #BE123C;
+  --gold: #FBBF24;
+  --line: rgba(255, 255, 255, 0.08);
+  --radius: 16px;
 }
 
 * { box-sizing: border-box; }
@@ -17,10 +19,13 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background:
-    radial-gradient(circle at 50% -10%, #2A3444 0%, var(--bg) 55%, var(--bg-vignette) 100%);
-  font-family: 'IBM Plex Mono', monospace;
-  color: var(--paper);
+  background-color: var(--bg-dark);
+  background-image: 
+    radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15), transparent 25%),
+    radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.15), transparent 25%);
+  background-attachment: fixed;
+  font-family: 'Inter', sans-serif;
+  color: var(--text-main);
   padding: 48px 20px 64px;
 }
 
@@ -65,40 +70,44 @@ body {
 }
 
 .auth-panel {
-  background: var(--paper);
-  color: var(--ink);
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  color: var(--text-main);
   border-radius: var(--radius);
-  padding: 24px;
-  border: 1px solid var(--line);
-  box-shadow: 0 20px 40px -20px rgba(0,0,0,0.6);
+  padding: 32px;
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
 }
 
 .auth-tabs {
   display: flex;
-  gap: 4px;
-  margin-bottom: 20px;
-  background: var(--paper-dim);
-  padding: 4px;
+  gap: 8px;
+  margin-bottom: 24px;
+  background: rgba(0,0,0,0.2);
+  padding: 6px;
   border-radius: var(--radius);
+  border: 1px solid var(--glass-border);
 }
 
 .auth-tab {
   flex: 1;
-  background: none;
+  background: transparent;
   border: none;
   padding: 10px 8px;
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 700;
-  font-size: 13px;
-  color: var(--ink-soft);
+  font-size: 14px;
+  color: var(--text-dim);
   cursor: pointer;
-  border-radius: 3px;
-  transition: background 0.15s ease, color 0.15s ease;
+  border-radius: calc(var(--radius) - 4px);
+  transition: all 0.2s ease;
 }
 
 .auth-tab.active {
-  background: var(--stamp);
-  color: var(--paper);
+  background: var(--accent-primary);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 .auth-form {
@@ -110,49 +119,55 @@ body {
 .auth-form label {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  font-size: 12px;
-  color: var(--ink-soft);
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-dim);
 }
 
 .auth-form input, .auth-form select {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 14px;
-  padding: 10px 12px;
-  border: 1px solid var(--line);
-  border-radius: 3px;
-  background: #fff;
-  color: var(--ink);
+  padding: 12px 16px;
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.15);
+  color: var(--text-main);
+  transition: all 0.2s ease;
 }
 
 .auth-form input:focus, .auth-form select:focus {
-  outline: 2px solid var(--gold);
-  outline-offset: 1px;
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
 .auth-hint {
-  font-size: 11px;
-  color: var(--ink-soft);
+  font-size: 12px;
+  color: var(--text-dim);
   margin: -6px 0 0;
 }
 
 .auth-submit {
-  background: var(--stamp);
-  color: var(--paper);
+  background: linear-gradient(135deg, var(--accent-primary), #8B5CF6);
+  color: #fff;
   border: none;
-  border-radius: 3px;
-  padding: 12px;
+  border-radius: 8px;
+  padding: 14px;
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 15px;
   cursor: pointer;
-  box-shadow: 0 5px 0 var(--stamp-dark);
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-top: 10px;
 }
 
-.auth-submit:hover { transform: translateY(-1px); }
+.auth-submit:hover { 
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
+}
 .auth-submit:active {
-  transform: translateY(3px);
+  transform: translateY(1px);
   box-shadow: 0 2px 0 var(--stamp-dark);
 }
 
@@ -174,12 +189,14 @@ body {
 }
 
 .user-chip {
-  background: var(--paper);
-  color: var(--ink);
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--text-main);
   font-size: 12px;
-  padding: 6px 12px;
+  padding: 6px 14px;
   border-radius: 999px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .logout-btn {
@@ -201,57 +218,63 @@ body {
 
 /* Stamp panel */
 .stamp-panel {
-  background: var(--paper);
-  color: var(--ink);
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  color: var(--text-main);
   border-radius: var(--radius);
-  padding: 28px;
+  padding: 32px;
   display: grid;
   grid-template-columns: 1fr 1.3fr;
-  gap: 24px;
+  gap: 32px;
   align-items: center;
-  box-shadow: 0 20px 40px -20px rgba(0,0,0,0.6);
-  border: 1px solid var(--line);
+  box-shadow: var(--glass-shadow);
+  border: 1px solid var(--glass-border);
 }
 
 .stamp-btn {
-  background: var(--stamp);
-  color: var(--paper);
+  background: linear-gradient(135deg, var(--accent-primary), #8B5CF6);
+  color: #fff;
   border: none;
   border-radius: var(--radius);
-  padding: 22px 16px;
+  padding: 24px 16px;
   font-family: 'Space Grotesk', sans-serif;
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   align-items: center;
   text-align: center;
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
-  box-shadow: 0 6px 0 var(--stamp-dark);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
 }
 
-.stamp-btn:hover { transform: translateY(-2px); }
+.stamp-btn:hover { 
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 12px 32px rgba(99, 102, 241, 0.5);
+}
 .stamp-btn:active {
-  transform: translateY(4px);
-  box-shadow: 0 2px 0 var(--stamp-dark);
+  transform: translateY(2px) scale(0.98);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
 }
 
 .stamp-btn:disabled {
-  background: #A9A196;
-  box-shadow: 0 6px 0 #8b8477;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.3);
+  box-shadow: none;
   cursor: default;
   transform: none;
 }
 
 .stamp-btn-label {
   font-weight: 700;
-  font-size: 16px;
+  font-size: 18px;
 }
 
 .stamp-btn-sub {
-  font-size: 12px;
-  opacity: 0.85;
-  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  opacity: 0.8;
+  font-family: 'Inter', sans-serif;
 }
 
 .progress-block { min-width: 0; }
@@ -266,32 +289,37 @@ body {
 .progress-percent {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 700;
-  font-size: 32px;
+  font-size: 36px;
+  background: linear-gradient(135deg, #60A5FA, #A78BFA);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .progress-fraction {
-  font-size: 12px;
-  color: var(--ink-soft);
+  font-size: 13px;
+  color: var(--text-dim);
 }
 
 .progress-track {
-  height: 10px;
-  background: var(--paper-dim);
+  height: 12px;
+  background: rgba(0, 0, 0, 0.3);
   border-radius: 999px;
   overflow: hidden;
-  border: 1px solid var(--line);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .progress-fill {
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, var(--gold), #E4C55C);
-  transition: width 0.35s ease;
+  background: linear-gradient(90deg, #60A5FA, #A78BFA);
+  box-shadow: 0 0 10px rgba(167, 139, 250, 0.5);
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .progress-note {
-  font-size: 12px;
-  color: var(--ink-soft);
+  font-size: 13px;
+  color: var(--text-dim);
   margin: 10px 0 0;
   line-height: 1.5;
 }
@@ -318,20 +346,21 @@ body {
 }
 
 .reset-btn {
-  background: none;
-  border: 1px solid #3A4657;
-  color: #9AA3AF;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 11px;
-  padding: 6px 12px;
-  border-radius: var(--radius);
+  background: transparent;
+  border: 1px solid var(--glass-border);
+  color: var(--text-dim);
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  padding: 8px 16px;
+  border-radius: 999px;
   cursor: pointer;
-  transition: border-color 0.15s ease, color 0.15s ease;
+  transition: all 0.2s ease;
 }
 
 .reset-btn:hover {
   border-color: var(--stamp);
   color: var(--stamp);
+  background: rgba(244, 63, 94, 0.1);
 }
 
 /* Calendar month navigator */
@@ -339,42 +368,43 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
-  background: var(--paper);
-  border: 1px solid var(--line);
+  margin-bottom: 24px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius);
-  padding: 10px 16px;
-  box-shadow: 0 4px 12px -4px rgba(0,0,0,0.2);
+  padding: 12px 20px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .cal-month-label {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 700;
   font-size: 18px;
-  color: var(--ink);
+  color: var(--text-main);
   letter-spacing: -0.01em;
 }
 
 .cal-nav-btn {
-  background: none;
-  border: 1px solid var(--line);
-  color: var(--ink);
-  font-size: 26px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  color: var(--text-main);
+  font-size: 20px;
   line-height: 1;
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  transition: all 0.2s ease;
 }
 
 .cal-nav-btn:hover:not(:disabled) {
-  background: var(--ink);
-  color: var(--paper);
-  border-color: var(--ink);
+  background: var(--accent-primary);
+  color: #fff;
+  border-color: var(--accent-primary);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 }
 
 .cal-nav-btn:disabled {
@@ -389,52 +419,55 @@ body {
 }
 
 .month-block {
-  background: var(--paper);
-  padding: 24px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  padding: 32px;
   border-radius: var(--radius);
-  border: 1px solid var(--line);
-  box-shadow: 0 10px 20px -10px rgba(0,0,0,0.3);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
 }
 
 .month-header {
-  margin: 0 0 16px;
+  margin: 0 0 20px;
   font-family: 'Space Grotesk', sans-serif;
-  color: var(--ink);
-  font-size: 20px;
+  color: var(--text-main);
+  font-size: 24px;
   text-align: center;
 }
 
 .week-days {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 6px;
-  margin-bottom: 8px;
+  gap: 8px;
+  margin-bottom: 12px;
   text-align: center;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--ink-soft);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-dim);
   text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 6px;
+  gap: 8px;
 }
 
 .month-legend {
-  margin-top: 20px;
-  padding: 12px;
-  background: var(--paper-dim);
-  border: 1px dashed #B7AD97;
-  border-radius: 3px;
-  font-size: 11px;
-  color: var(--ink-soft);
+  margin-top: 24px;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--text-dim);
 }
 
 .month-legend p {
   margin: 4px 0;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .day {
@@ -444,13 +477,13 @@ body {
   align-items: center;
   justify-content: center;
   gap: 4px;
-  background: var(--paper-dim);
-  border: 1px dashed #B7AD97;
-  border-radius: 3px;
-  color: var(--ink);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  color: var(--text-main);
   cursor: default;
   position: relative;
-  transition: background 0.12s ease, transform 0.08s ease;
+  transition: all 0.2s ease;
   user-select: none;
 }
 
@@ -461,30 +494,29 @@ body {
 }
 
 .day.disabled {
-  background: #EBE6DC;
-  color: #C0B7A6;
-  border-style: solid;
+  background: rgba(0, 0, 0, 0.2);
+  color: rgba(255, 255, 255, 0.2);
   border-color: transparent;
   cursor: default;
 }
 
 .day.libur {
-  background: #F1DCDA;
-  color: #B23A2F;
-  border: 1px dashed #E2BDBA;
+  background: rgba(244, 63, 94, 0.1);
+  color: var(--stamp);
+  border: 1px solid rgba(244, 63, 94, 0.3);
 }
 
 .cal-date {
-  font-size: 14px;
-  font-weight: bold;
+  font-size: 15px;
+  font-weight: 600;
 }
 
 .cal-badge {
   font-size: 10px;
-  background: var(--ink);
-  color: var(--paper);
-  padding: 2px 5px;
-  border-radius: 3px;
+  background: var(--accent-primary);
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 
 .cal-label {
@@ -499,10 +531,10 @@ body {
 }
 
 .day.done {
-  background: var(--paper-dim);
+  background: rgba(59, 130, 246, 0.1);
   color: transparent;
-  border-style: solid;
-  border-color: var(--stamp);
+  border: 1px solid var(--accent-primary);
+  box-shadow: inset 0 0 12px rgba(59, 130, 246, 0.2);
 }
 
 .day.done .cal-date, .day.done .cal-badge {
@@ -510,21 +542,15 @@ body {
 }
 
 .day.done::after {
-  content: attr(data-num);
+  content: "✓";
   position: absolute;
-  color: var(--stamp);
+  color: var(--accent-glow);
   font-weight: 600;
-  font-family: 'Space Grotesk', sans-serif;
-  transform: rotate(-8deg);
-  border: 2px solid var(--stamp);
-  border-radius: 999px;
-  width: 76%;
-  height: 76%;
+  font-size: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
-  opacity: 0.9;
+  text-shadow: 0 0 8px rgba(96, 165, 250, 0.6);
 }
 
 .footer {
