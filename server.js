@@ -222,10 +222,44 @@ app.get('/api/attendance', auth, async (req, res) => {
   }
 });
 
+const HOLIDAYS = ['2026-08-17', '2026-08-25'];
+
+function getWorkingDate(startDateStr, workDays, targetDayNumber) {
+  let currDate = new Date(startDateStr);
+  let dayCount = 1;
+  while (dayCount <= targetDayNumber) {
+    const yyyy = currDate.getFullYear();
+    const mm = String(currDate.getMonth() + 1).padStart(2, '0');
+    const dd = String(currDate.getDate()).padStart(2, '0');
+    const str = `${yyyy}-${mm}-${dd}`;
+    
+    const dayOfWeek = currDate.getDay();
+    let isWeekend = (workDays === 5) ? (dayOfWeek === 0 || dayOfWeek === 6) : (dayOfWeek === 0);
+    
+    if (!isWeekend && !HOLIDAYS.includes(str)) {
+      if (dayCount === targetDayNumber) return new Date(currDate);
+      dayCount++;
+    }
+    currDate.setDate(currDate.getDate() + 1);
+  }
+  return null;
+}
+
 app.post('/api/attendance/:day/toggle', auth, async (req, res) => {
   const day = parseInt(req.params.day, 10);
   if (!Number.isInteger(day) || day < 1 || day > TOTAL_DAYS) {
     return res.status(400).json({ error: 'Nomor hari tidak valid' });
+  }
+
+  // Backend Validation: prevent stamping future dates
+  const targetDate = getWorkingDate(req.startDate, req.workDays || 6, day);
+  if (targetDate) {
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    targetDate.setHours(0,0,0,0);
+    if (targetDate > today) {
+      return res.status(403).json({ error: 'Akses ditolak: Anda tidak bisa absen untuk masa depan' });
+    }
   }
 
   try {

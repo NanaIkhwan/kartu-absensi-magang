@@ -392,7 +392,6 @@ function buildMonthBlock(year, month) {
       cell.appendChild(badgeSpan);
 
       if (doneDays.has(dayNum)) cell.classList.add('done');
-      cell.addEventListener('click', () => toggleDay(dayNum));
     } else {
       cell.classList.add('disabled');
       const dateSpan = document.createElement('span');
@@ -506,9 +505,21 @@ function render(isInitialLoad = false) {
       showMonth(monthBlocks.length - 1);
     }
   } else {
-    stampTodayBtn.disabled = false;
     const nextDate = validWorkingDays[next - 1];
-    nextDayLabelEl.textContent = `Hari ke-${next} (${formatDateShort(nextDate)})`;
+    
+    // Check if nextDate is in the future
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const targetDate = new Date(nextDate);
+    targetDate.setHours(0, 0, 0, 0);
+
+    if (targetDate > today) {
+      stampTodayBtn.disabled = true;
+      nextDayLabelEl.textContent = `Hari ke-${next} belum tiba`;
+    } else {
+      stampTodayBtn.disabled = false;
+      nextDayLabelEl.textContent = `Hari ke-${next} (${formatDateShort(nextDate)})`;
+    }
     
     // Auto focus to the month containing nextDate
     if (isInitialLoad) {

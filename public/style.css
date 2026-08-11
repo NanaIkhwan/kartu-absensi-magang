@@ -433,7 +433,7 @@ body {
   border: 1px dashed #B7AD97;
   border-radius: 3px;
   color: var(--ink);
-  cursor: pointer;
+  cursor: default;
   position: relative;
   transition: background 0.12s ease, transform 0.08s ease;
   user-select: none;
@@ -457,14 +457,6 @@ body {
   background: #F1DCDA;
   color: #B23A2F;
   border: 1px dashed #E2BDBA;
-}
-
-.day:not(.disabled):not(.empty):hover {
-  background: #D8CEB9;
-}
-
-.day:not(.disabled):not(.empty):active {
-  transform: scale(0.94);
 }
 
 .cal-date {
