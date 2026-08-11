@@ -422,6 +422,21 @@ body {
   gap: 6px;
 }
 
+.month-legend {
+  margin-top: 20px;
+  padding: 12px;
+  background: var(--paper-dim);
+  border: 1px dashed #B7AD97;
+  border-radius: 3px;
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+
+.month-legend p {
+  margin: 4px 0;
+  font-weight: 600;
+}
+
 .day {
   aspect-ratio: 1;
   display: flex;

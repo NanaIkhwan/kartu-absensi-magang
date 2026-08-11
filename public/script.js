@@ -391,6 +391,7 @@ function buildMonthBlock(year, month) {
   const startDate = validWorkingDays[0];
   const endDate = validWorkingDays[validWorkingDays.length - 1];
   const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const holidaysInMonth = [];
 
   for (let d = 1; d <= daysInMonth; d++) {
     const cellDate = new Date(year, month, d);
@@ -431,8 +432,12 @@ function buildMonthBlock(year, month) {
       // If it reaches here, it's NOT a valid working day (either weekend or holiday)
       // Check if it's within the internship period to color it red
       if (cellDate >= startDate && cellDate <= endDate) {
-        labelSpan.textContent = holidayName || 'Libur';
+        labelSpan.textContent = 'Libur';
         cell.classList.add('libur');
+        
+        if (holidayName) {
+          holidaysInMonth.push(`${d} ${MONTHS[month]}: ${holidayName}`);
+        }
       }
       cell.appendChild(labelSpan);
     }
@@ -441,6 +446,22 @@ function buildMonthBlock(year, month) {
   }
 
   monthBlock.appendChild(calGrid);
+  
+  if (holidaysInMonth.length > 0) {
+    const legendDiv = document.createElement('div');
+    legendDiv.className = 'month-legend';
+    
+    // Deduplicate array in case of multiple same holidays (though rare)
+    const uniqueHolidays = [...new Set(holidaysInMonth)];
+    
+    uniqueHolidays.forEach(h => {
+      const p = document.createElement('p');
+      p.textContent = `• ${h}`;
+      legendDiv.appendChild(p);
+    });
+    monthBlock.appendChild(legendDiv);
+  }
+
   return monthBlock;
 }
 
