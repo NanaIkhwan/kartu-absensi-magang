@@ -592,6 +592,34 @@ body {
 }
 .eye-btn:hover { opacity: 1; }
 
+.pwd-criteria {
+  margin: -2px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 11px;
+  color: var(--ink-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.pwd-criteria li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.2s ease;
+}
+.pwd-criteria li::before {
+  content: '○';
+  font-size: 10px;
+}
+.pwd-criteria li.valid {
+  color: #2F8A4E;
+}
+.pwd-criteria li.valid::before {
+  content: '✓';
+  font-weight: bold;
+}
+
 /* ===== Modal ===== */
 .modal-overlay {
   position: fixed;

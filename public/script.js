@@ -96,6 +96,23 @@ document.querySelectorAll('.eye-btn').forEach(btn => {
   });
 });
 
+// ---------- Password Strength Checker ----------
+const regPasswordInput = document.getElementById('regPasswordInput');
+const critLength = document.getElementById('critLength');
+const critNumber = document.getElementById('critNumber');
+
+if (regPasswordInput) {
+  regPasswordInput.addEventListener('input', (e) => {
+    const val = e.target.value;
+    
+    if (val.length >= 6) critLength.classList.add('valid');
+    else critLength.classList.remove('valid');
+
+    if (/\d/.test(val)) critNumber.classList.add('valid');
+    else critNumber.classList.remove('valid');
+  });
+}
+
 // ---------- Auth tab switching ----------
 
 tabLogin.addEventListener('click', () => {
@@ -114,6 +131,9 @@ tabRegister.addEventListener('click', () => {
   loginForm.style.display = 'none';
   forgotPasswordForm.style.display = 'none';
   authError.textContent = '';
+  // Reset UI criteria
+  if (critLength) critLength.classList.remove('valid');
+  if (critNumber) critNumber.classList.remove('valid');
 });
 
 btnShowForgot.addEventListener('click', () => {
