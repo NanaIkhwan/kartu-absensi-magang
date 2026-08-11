@@ -4,63 +4,39 @@ const cookieParser = require('cookie-parser');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const path = require('path');
-const mysql = require('mysql2/promise');
+const { Pool } = require('pg');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'ganti-secret-ini-di-env';
 const TOTAL_DAYS = 90;
 
-// Support Railway MySQL plugin (MYSQL_URL or MYSQL* vars) and local config (DB_*)
-const isProduction = process.env.NODE_ENV === 'production';
-
-let pool;
-if (process.env.MYSQL_URL) {
-  console.log('[DB] Menggunakan MYSQL_URL (Railway connection string)');
-  pool = mysql.createPool(process.env.MYSQL_URL + '?ssl={"rejectUnauthorized":false}');
-} else if (process.env.MYSQLHOST) {
-  console.log('[DB] Menggunakan MYSQLHOST:', process.env.MYSQLHOST);
-  pool = mysql.createPool({
-    host:     process.env.MYSQLHOST,
-    port:     parseInt(process.env.MYSQLPORT || '3306'),
-    user:     process.env.MYSQLUSER,
-    password: process.env.MYSQLPASSWORD,
-    database: process.env.MYSQLDATABASE,
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0,
-    ssl: { rejectUnauthorized: false }
-  });
+if (!process.env.DATABASE_URL) {
+  console.warn('[DB] PERINGATAN: DATABASE_URL belum diset. Tambahkan PostgreSQL plugin di Railway.');
 } else {
-  console.log('[DB] Menggunakan config lokal (localhost)');
-  pool = mysql.createPool({
-    host:     process.env.DB_HOST     || 'localhost',
-    port:     parseInt(process.env.DB_PORT || '3306'),
-    user:     process.env.DB_USER     || 'root',
-    password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME     || 'absensi_magang',
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
-  });
+  console.log('[DB] Menggunakan DATABASE_URL (PostgreSQL)');
 }
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
+});
 
 async function initDb() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      username VARCHAR(255) UNIQUE NOT NULL,
+      id SERIAL PRIMARY KEY,
+      username TEXT UNIQUE NOT NULL,
       password_hash TEXT NOT NULL,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      created_at TIMESTAMP DEFAULT NOW()
     );
   `);
   await pool.query(`
     CREATE TABLE IF NOT EXISTS attendance (
-      user_id INT,
-      day_number INT NOT NULL,
-      checked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      PRIMARY KEY (user_id, day_number),
-      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+      day_number INTEGER NOT NULL,
+      checked_at TIMESTAMP DEFAULT NOW(),
+      PRIMARY KEY (user_id, day_number)
     );
   `);
 }
@@ -101,15 +77,15 @@ app.post('/api/register', async (req, res) => {
   if (password.length < 6) return res.status(400).json({ error: 'Password minimal 6 karakter' });
 
   try {
-    const [existing] = await pool.query('SELECT id FROM users WHERE username = ?', [username]);
-    if (existing.length > 0) return res.status(409).json({ error: 'Username sudah dipakai' });
+    const existing = await pool.query('SELECT id FROM users WHERE username = $1', [username]);
+    if (existing.rows.length > 0) return res.status(409).json({ error: 'Username sudah dipakai' });
 
     const hash = await bcrypt.hash(password, 10);
-    const [result] = await pool.query(
-      'INSERT INTO users (username, password_hash) VALUES (?, ?)',
+    const result = await pool.query(
+      'INSERT INTO users (username, password_hash) VALUES ($1, $2) RETURNING id, username',
       [username, hash]
     );
-    const user = { id: result.insertId, username };
+    const user = result.rows[0];
     setAuthCookie(res, user);
     res.json({ username: user.username });
   } catch (e) {
@@ -123,10 +99,10 @@ app.post('/api/login', async (req, res) => {
   if (!username || !password) return res.status(400).json({ error: 'Username dan password wajib diisi' });
 
   try {
-    const [rows] = await pool.query('SELECT id, username, password_hash FROM users WHERE username = ?', [username]);
-    if (rows.length === 0) return res.status(401).json({ error: 'Username atau password salah' });
+    const result = await pool.query('SELECT id, username, password_hash FROM users WHERE username = $1', [username]);
+    if (result.rows.length === 0) return res.status(401).json({ error: 'Username atau password salah' });
 
-    const user = rows[0];
+    const user = result.rows[0];
     const match = await bcrypt.compare(password, user.password_hash);
     if (!match) return res.status(401).json({ error: 'Username atau password salah' });
 
@@ -151,8 +127,8 @@ app.get('/api/me', auth, (req, res) => {
 
 app.get('/api/attendance', auth, async (req, res) => {
   try {
-    const [rows] = await pool.query('SELECT day_number FROM attendance WHERE user_id = ? ORDER BY day_number', [req.userId]);
-    res.json({ days: rows.map(r => r.day_number) });
+    const result = await pool.query('SELECT day_number FROM attendance WHERE user_id = $1 ORDER BY day_number', [req.userId]);
+    res.json({ days: result.rows.map(r => r.day_number) });
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: 'Gagal mengambil data' });
@@ -166,19 +142,19 @@ app.post('/api/attendance/:day/toggle', auth, async (req, res) => {
   }
 
   try {
-    const [existing] = await pool.query(
-      'SELECT 1 FROM attendance WHERE user_id = ? AND day_number = ?',
+    const existing = await pool.query(
+      'SELECT 1 FROM attendance WHERE user_id = $1 AND day_number = $2',
       [req.userId, day]
     );
 
-    if (existing.length > 0) {
-      await pool.query('DELETE FROM attendance WHERE user_id = ? AND day_number = ?', [req.userId, day]);
+    if (existing.rows.length > 0) {
+      await pool.query('DELETE FROM attendance WHERE user_id = $1 AND day_number = $2', [req.userId, day]);
     } else {
-      await pool.query('INSERT INTO attendance (user_id, day_number) VALUES (?, ?)', [req.userId, day]);
+      await pool.query('INSERT INTO attendance (user_id, day_number) VALUES ($1, $2)', [req.userId, day]);
     }
 
-    const [rows] = await pool.query('SELECT day_number FROM attendance WHERE user_id = ? ORDER BY day_number', [req.userId]);
-    res.json({ days: rows.map(r => r.day_number) });
+    const result = await pool.query('SELECT day_number FROM attendance WHERE user_id = $1 ORDER BY day_number', [req.userId]);
+    res.json({ days: result.rows.map(r => r.day_number) });
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: 'Gagal mengubah absen' });
@@ -187,7 +163,7 @@ app.post('/api/attendance/:day/toggle', auth, async (req, res) => {
 
 app.post('/api/attendance/reset', auth, async (req, res) => {
   try {
-    await pool.query('DELETE FROM attendance WHERE user_id = ?', [req.userId]);
+    await pool.query('DELETE FROM attendance WHERE user_id = $1', [req.userId]);
     res.json({ days: [] });
   } catch (e) {
     console.error(e);
@@ -205,7 +181,6 @@ initDb()
     app.listen(PORT, () => console.log(`Server jalan di port ${PORT}`));
   })
   .catch((err) => {
-    console.error('Gagal init database. Pastikan MySQL sudah menyala dan database sudah dibuat.');
-    console.error(err);
+    console.error('Gagal init database:', err.message);
     process.exit(1);
   });
