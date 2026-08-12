@@ -117,6 +117,27 @@ const deleteAccError    = document.getElementById('deleteAccError');
 
 let doneDays = new Set();
 
+// ---------- Theme Logic ----------
+const themeBtns = document.querySelectorAll('.theme-btn');
+const savedTheme = localStorage.getItem('app-theme') || 'blue';
+document.documentElement.setAttribute('data-theme', savedTheme);
+
+themeBtns.forEach(btn => {
+  if (btn.dataset.themeVal === savedTheme) {
+    btn.classList.add('active');
+  } else {
+    btn.classList.remove('active');
+  }
+
+  btn.addEventListener('click', () => {
+    themeBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const newTheme = btn.dataset.themeVal;
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('app-theme', newTheme);
+  });
+});
+
 // ---------- Password Visibility Toggle ----------
 document.querySelectorAll('.eye-btn').forEach(btn => {
   btn.addEventListener('click', () => {

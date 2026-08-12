@@ -1,17 +1,49 @@
 :root {
+  /* Theme Variables */
+  --theme-rgb: 59, 130, 246; /* Blue */
+  --theme-glow-rgb: 139, 92, 246; /* Purple */
+
   --bg-dark: #0B0F19;
   --glass-bg: rgba(17, 24, 39, 0.7);
   --glass-border: rgba(255, 255, 255, 0.08);
   --glass-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.5);
   --text-main: #F3F4F6;
   --text-dim: #9CA3AF;
-  --accent-primary: #3B82F6;
-  --accent-glow: #60A5FA;
+  
+  --accent-primary: rgb(var(--theme-rgb));
+  --accent-glow: rgb(var(--theme-glow-rgb));
+  
   --stamp: #F43F5E;
   --stamp-dark: #BE123C;
   --gold: #FBBF24;
   --line: rgba(255, 255, 255, 0.08);
   --radius: 16px;
+}
+
+/* Theme definitions */
+[data-theme="blue"] {
+  --theme-rgb: 59, 130, 246;
+  --theme-glow-rgb: 139, 92, 246;
+}
+[data-theme="purple"] {
+  --theme-rgb: 139, 92, 246;
+  --theme-glow-rgb: 236, 72, 153;
+}
+[data-theme="teal"] {
+  --theme-rgb: 20, 184, 166;
+  --theme-glow-rgb: 59, 130, 246;
+}
+[data-theme="maroon"] {
+  --theme-rgb: 159, 18, 57;
+  --theme-glow-rgb: 225, 29, 72;
+}
+[data-theme="green"] {
+  --theme-rgb: 34, 197, 94;
+  --theme-glow-rgb: 20, 184, 166;
+}
+[data-theme="orange"] {
+  --theme-rgb: 249, 115, 22;
+  --theme-glow-rgb: 234, 179, 8;
 }
 
 * { box-sizing: border-box; }
@@ -21,8 +53,8 @@ body {
   min-height: 100vh;
   background-color: var(--bg-dark);
   background-image: 
-    radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15), transparent 25%),
-    radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.15), transparent 25%);
+    radial-gradient(circle at 15% 50%, rgba(var(--theme-rgb), 0.15), transparent 25%),
+    radial-gradient(circle at 85% 30%, rgba(var(--theme-glow-rgb), 0.15), transparent 25%);
   background-attachment: fixed;
   font-family: 'Inter', sans-serif;
   color: var(--text-main);
@@ -107,7 +139,7 @@ body {
 .auth-tab.active {
   background: var(--accent-primary);
   color: #fff;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 12px rgba(var(--theme-rgb), 0.3);
 }
 
 .auth-form {
@@ -143,7 +175,7 @@ body {
 .auth-form input:focus, .auth-form select:focus {
   outline: none;
   border-color: var(--accent-primary);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 0 0 3px rgba(var(--theme-rgb), 0.2);
 }
 
 .auth-hint {
@@ -153,7 +185,7 @@ body {
 }
 
 .auth-submit {
-  background: linear-gradient(135deg, var(--accent-primary), #8B5CF6);
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-glow));
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -226,13 +258,13 @@ body {
 }
 
 .user-chip {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2));
+  background: linear-gradient(135deg, rgba(var(--theme-rgb), 0.2), rgba(var(--theme-glow-rgb), 0.2));
   color: var(--text-main);
   font-size: 13px;
   font-weight: 600;
   padding: 6px 16px;
   border-radius: 999px;
-  border: 1px solid rgba(59, 130, 246, 0.3);
+  border: 1px solid rgba(var(--theme-rgb), 0.3);
 }
 
 .icon-btn {
@@ -272,6 +304,49 @@ body {
   border-color: var(--stamp);
   color: var(--stamp);
   background: rgba(244, 63, 94, 0.1);
+}
+
+/* ===== Theme Picker ===== */
+.theme-picker {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.theme-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+.theme-btn:hover {
+  transform: scale(1.1);
+}
+.theme-btn.active {
+  border-color: #fff;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+/* Theme Button Colors */
+.theme-btn[data-theme-val="blue"] { background: rgb(59, 130, 246); }
+.theme-btn[data-theme-val="purple"] { background: rgb(139, 92, 246); }
+.theme-btn[data-theme-val="teal"] { background: rgb(20, 184, 166); }
+.theme-btn[data-theme-val="maroon"] { background: rgb(159, 18, 57); }
+.theme-btn[data-theme-val="green"] { background: rgb(34, 197, 94); }
+.theme-btn[data-theme-val="orange"] { background: rgb(249, 115, 22); }
+.theme-btn[data-theme-val="dark"] { background: rgb(71, 85, 105); }
+
+/* Settings Modal Adjustments */
+.settings-section-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px;
+  color: var(--text-dim);
+  margin: 0 0 8px 0;
+  text-align: left;
 }
 
 /* Stamp panel */

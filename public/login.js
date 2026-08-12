@@ -1,6 +1,11 @@
 // ===== login.js =====
 // Handles all auth logic: login, register, forgot password
 
+// ---------- Theme Load ----------
+const savedTheme = localStorage.getItem('app-theme') || 'blue';
+document.documentElement.setAttribute('data-theme', savedTheme);
+
+
 // ---------- API helpers ----------
 async function apiPost(url, body) {
   const res = await fetch(url, {
