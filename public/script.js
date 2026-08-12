@@ -70,120 +70,10 @@ function formatDateShort(d) {
   return `${d.getDate()} ${MONTHS[d.getMonth()].slice(0,3)}`;
 }
 
-const authScreen = document.getElementById('authScreen');
+const authScreen = null; // tidak digunakan di absensi.html
 const appScreen = document.getElementById('appScreen');
 
-const tabLogin = document.getElementById('tabLogin');
-const tabRegister = document.getElementById('tabRegister');
-const loginForm = document.getElementById('loginForm');
-const registerForm = document.getElementById('registerForm');
-const authError = document.getElementById('authError');
-
-const userChip = document.getElementById('userChip');
-const logoutBtn = document.getElementById('logoutBtn');
-
-const gridEl = document.getElementById('grid');
-const progressPercentEl = document.getElementById('progressPercent');
-const progressFractionEl = document.getElementById('progressFraction');
-const progressFillEl = document.getElementById('progressFill');
-const progressNoteEl = document.getElementById('progressNote');
-const stampTodayBtn = document.getElementById('stampToday');
-const nextDayLabelEl = document.getElementById('nextDayLabel');
-const resetBtn = document.getElementById('resetBtn');
-
-let doneDays = new Set();
-
-const btnShowForgot = document.getElementById('btnShowForgot');
-const btnBackToLogin = document.getElementById('btnBackToLogin');
-const forgotPasswordForm = document.getElementById('forgotPasswordForm');
-
-const btnSettings = document.getElementById('btnSettings');
-const settingsModal = document.getElementById('settingsModal');
-const btnCloseSettings = document.getElementById('btnCloseSettings');
-
-const tabChangePwd = document.getElementById('tabChangePwd');
-const tabDeleteAcc = document.getElementById('tabDeleteAcc');
-const changePasswordForm = document.getElementById('changePasswordForm');
-const deleteAccountForm = document.getElementById('deleteAccountForm');
-const changePwdError = document.getElementById('changePwdError');
-const deleteAccError = document.getElementById('deleteAccError');
-
-// ---------- Password Visibility Toggle ----------
-document.querySelectorAll('.eye-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const input = btn.previousElementSibling;
-    if (input.type === 'password') {
-      input.type = 'text';
-      btn.textContent = '🙈';
-    } else {
-      input.type = 'password';
-      btn.textContent = '👁️';
-    }
-  });
-});
-
-// ---------- Password Strength Checker ----------
-const regPasswordInput = document.getElementById('regPasswordInput');
-const critLength = document.getElementById('critLength');
-const critNumber = document.getElementById('critNumber');
-
-if (regPasswordInput) {
-  regPasswordInput.addEventListener('input', (e) => {
-    const val = e.target.value;
-    
-    if (val.length >= 6) critLength.classList.add('valid');
-    else critLength.classList.remove('valid');
-
-    if (/\d/.test(val)) critNumber.classList.add('valid');
-    else critNumber.classList.remove('valid');
-  });
-}
-
-// ---------- Auth tab switching ----------
-
-tabLogin.addEventListener('click', () => {
-  tabLogin.classList.add('active');
-  tabRegister.classList.remove('active');
-  loginForm.style.display = 'flex';
-  registerForm.style.display = 'none';
-  forgotPasswordForm.style.display = 'none';
-  authError.textContent = '';
-});
-
-tabRegister.addEventListener('click', () => {
-  tabRegister.classList.add('active');
-  tabLogin.classList.remove('active');
-  registerForm.style.display = 'flex';
-  loginForm.style.display = 'none';
-  forgotPasswordForm.style.display = 'none';
-  authError.textContent = '';
-  // Reset UI criteria
-  if (critLength) critLength.classList.remove('valid');
-  if (critNumber) critNumber.classList.remove('valid');
-});
-
-btnShowForgot.addEventListener('click', () => {
-  loginForm.style.display = 'none';
-  forgotPasswordForm.style.display = 'flex';
-  authError.textContent = '';
-});
-
-btnBackToLogin.addEventListener('click', () => {
-  forgotPasswordForm.style.display = 'none';
-  loginForm.style.display = 'flex';
-  authError.textContent = '';
-});
-
-tabRegister.addEventListener('click', () => {
-  tabRegister.classList.add('active');
-  tabLogin.classList.remove('active');
-  registerForm.style.display = 'flex';
-  loginForm.style.display = 'none';
-  authError.textContent = '';
-});
-
-// ---------- Auth requests ----------
-
+// ---------- API helpers ----------
 async function apiPost(url, body) {
   const res = await fetch(url, {
     method: 'POST',
@@ -203,67 +93,51 @@ async function apiGet(url) {
   return data;
 }
 
-loginForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  authError.textContent = '';
-  const fd = new FormData(loginForm);
-  try {
-    const data = await apiPost('/api/login', {
-      username: fd.get('username'),
-      password: fd.get('password')
-    });
-    await enterApp(data);
-  } catch (err) {
-    authError.textContent = err.message;
-  }
+const userChip   = document.getElementById('userChip');
+const logoutBtn  = document.getElementById('logoutBtn');
+
+const gridEl             = document.getElementById('grid');
+const progressPercentEl  = document.getElementById('progressPercent');
+const progressFractionEl = document.getElementById('progressFraction');
+const progressFillEl     = document.getElementById('progressFill');
+const progressNoteEl     = document.getElementById('progressNote');
+const stampTodayBtn      = document.getElementById('stampToday');
+const nextDayLabelEl     = document.getElementById('nextDayLabel');
+const resetBtn           = document.getElementById('resetBtn');
+
+const btnSettings       = document.getElementById('btnSettings');
+const settingsModal     = document.getElementById('settingsModal');
+const btnCloseSettings  = document.getElementById('btnCloseSettings');
+const tabChangePwd      = document.getElementById('tabChangePwd');
+const tabDeleteAcc      = document.getElementById('tabDeleteAcc');
+const changePasswordForm = document.getElementById('changePasswordForm');
+const deleteAccountForm = document.getElementById('deleteAccountForm');
+const changePwdError    = document.getElementById('changePwdError');
+const deleteAccError    = document.getElementById('deleteAccError');
+
+let doneDays = new Set();
+
+// ---------- Password Visibility Toggle ----------
+document.querySelectorAll('.eye-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const input = btn.previousElementSibling;
+    if (input.type === 'password') {
+      input.type = 'text';
+      btn.textContent = '🙈';
+    } else {
+      input.type = 'password';
+      btn.textContent = '👁️';
+    }
+  });
 });
 
-registerForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  authError.textContent = '';
-  const fd = new FormData(registerForm);
-  try {
-    const data = await apiPost('/api/register', {
-      username: fd.get('username'),
-      password: fd.get('password'),
-      start_date: fd.get('start_date'),
-      work_days: fd.get('work_days')
-    });
-    await enterApp(data);
-  } catch (err) {
-    authError.textContent = err.message;
-  }
-});
-
-forgotPasswordForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  authError.textContent = '';
-  const fd = new FormData(forgotPasswordForm);
-  try {
-    await apiPost('/api/forgot-password', {
-      username: fd.get('username'),
-      new_password: fd.get('new_password')
-    });
-    alert('Password berhasil direset. Silakan login kembali.');
-    btnBackToLogin.click();
-    forgotPasswordForm.reset();
-  } catch (err) {
-    authError.textContent = err.message;
-  }
-});
-
+// ---------- Logout ----------
 logoutBtn.addEventListener('click', async () => {
   await apiPost('/api/logout');
-  doneDays = new Set();
-  appScreen.style.display = 'none';
-  authScreen.style.display = 'block';
-  loginForm.reset();
-  registerForm.reset();
-  forgotPasswordForm.reset();
+  window.location.href = '/login.html';
 });
 
 // ---------- Settings Modal ----------
-
 btnSettings.addEventListener('click', () => {
   settingsModal.style.display = 'flex';
   changePwdError.textContent = '';
@@ -312,22 +186,13 @@ deleteAccountForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   deleteAccError.textContent = '';
   const fd = new FormData(deleteAccountForm);
-  
   if (!confirm('Peringatan: Aksi ini tidak dapat dibatalkan! Yakin ingin menghapus akun?')) return;
-  
   try {
     await apiPost('/api/delete-account', {
       password: fd.get('password')
     });
     alert('Akun berhasil dihapus secara permanen.');
-    btnCloseSettings.click();
-    
-    // reset UI to login
-    doneDays = new Set();
-    appScreen.style.display = 'none';
-    authScreen.style.display = 'block';
-    loginForm.reset();
-    registerForm.reset();
+    window.location.href = '/login.html';
   } catch (err) {
     deleteAccError.textContent = err.message;
   }
@@ -338,7 +203,6 @@ deleteAccountForm.addEventListener('submit', async (e) => {
 async function enterApp(userData) {
   userChip.textContent = userData.username;
   initCalendar(userData.start_date || '2026-07-27', userData.work_days || 6);
-  authScreen.style.display = 'none';
   appScreen.style.display = 'block';
   await loadAttendance();
 }
