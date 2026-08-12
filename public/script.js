@@ -499,8 +499,7 @@ const loadingOverlay = document.getElementById('loadingOverlay');
     const me = await apiGet('/api/me');
     await enterApp(me);
   } catch (err) {
-    authScreen.style.display = 'block';
-    appScreen.style.display = 'none';
+    window.location.href = '/login.html';
   } finally {
     if (loadingOverlay) loadingOverlay.style.display = 'none';
   }
